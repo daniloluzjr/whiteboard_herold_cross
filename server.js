@@ -193,7 +193,46 @@ const pool = mysql.createPool(process.env.DATABASE_URL || dbConfig);
 // --- Setup / Migration Helper ---
 async function runMigrations() {
     try {
-        // Check if 'solution' column exists
+        // --- Core Table Creation ---
+        console.log("Migration: Checking core tables...");
+        
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS task_groups (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                color VARCHAR(50) DEFAULT 'blue',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password_hash VARCHAR(255) NOT NULL,
+                status VARCHAR(50) DEFAULT 'free',
+                last_login DATETIME NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS tasks (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                group_id INT,
+                title VARCHAR(255) NOT NULL,
+                description TEXT,
+                priority ENUM('red', 'orange', 'yellow') DEFAULT 'yellow',
+                status ENUM('todo', 'done') DEFAULT 'todo',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                completed_at DATETIME,
+                FOREIGN KEY (group_id) REFERENCES task_groups(id) ON DELETE CASCADE
+            )
+        `);
+        console.log("Migration: Core tables verified.");
+
+        // --- Column-level Migrations ---
         const [columns] = await pool.query("SHOW COLUMNS FROM tasks LIKE 'solution'");
         if (columns.length === 0) {
             console.log("Migration: Adding 'solution' column to tasks table...");

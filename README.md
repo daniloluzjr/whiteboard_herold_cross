@@ -1,8 +1,8 @@
 # Whiteboard Project 📝
 
 **Live App:** [https://glasnevinoffice.online/](https://glasnevinoffice.online/)  
-**GitHub Repository:** [https://github.com/daniloluzjr/whiteboard](https://github.com/daniloluzjr/whiteboard)  
-**Backend API (Railway):** `https://web-production-b230e.up.railway.app`
+**GitHub Repository:** [https://github.com/daniloluzjr/whiteboard_herold_cross](https://github.com/daniloluzjr/whiteboard_herold_cross)  
+**Backend API (Railway):** `https://web-production-0f66c.up.railway.app`
 
 This is a real-time, collaborative whiteboard application designed for team task management. It separates "To Do" and "Done" tasks into intuitive card groups, providing a visual overview of team activity, now featuring a modern **Glassmorphism** UI.
 

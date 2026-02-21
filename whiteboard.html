@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whiteboard - Harold Cross</title>
+    <link rel="icon" type="image/png" href="assets/favicon-32x32.png">
+    <link rel="stylesheet" href="app.css?v=6">
+</head>
+
+<body>
+    <div class="app-container">
+        <div id="mobile-overlay"></div>
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Menu</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <!-- Navigation items will go here -->
+            </nav>
+
+            <div class="employee-status-list">
+                <h4>STATUS</h4>
+                <ul id="user-status-list">
+                    <!-- Users loaded dynamically -->
+                </ul>
+            </div>
+
+            <div class="add-sticker-container">
+                <button class="add-sticker-btn">+</button>
+                <span>Add Sticker</span>
+            </div>
+
+            <div class="filter-container">
+                <input type="text" id="filter-input" placeholder="Search">
+            </div>
+
+            <div class="logout-container logout-container-flex">
+                <button id="logout-btn" class="logout-btn">Logout</button>
+
+                <div class="sidebar-footer-link">
+                    <a href="mailto:professor_luz@hotmail.com">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                            viewBox="0 0 16 16">
+                            <path
+                                d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+                        </svg>
+                        Need Support?
+                    </a>
+                    <a href="https://www.luxsolutions.tech/" target="_blank">
+                        <img src="assets/logo.png" alt="Lux Solutions Logo" class="sidebar-logo">
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header main-header-flex">
+                <button id="mobile-menu-toggle" class="mobile-menu-btn hidden-desktop">☰</button>
+                <h1>Whiteboard - Harold Cross</h1>
+            </header>
+            <section class="tasks-grid">
+                <!-- Introduction Card (New Feature) -->
+                <div class="task-card non-deletable" data-group="introduction" data-type="todo">
+                    <div class="card-header">
+                        <h3>Introduction (Schedule)</h3>
+                        <button class="add-task-item-btn text-cyan">+</button>
+                    </div>
+                    <ul id="introduction-list"><!-- Tasks grouped by date will go here --></ul>
+                </div>
+
+                <div class="task-card non-deletable" data-group="introduction" data-type="done">
+                    <div class="card-header">
+                        <h3>Tasks done - Introduction</h3>
+                    </div>
+                    <ul id="introduction-done-list"><!-- Completed tasks will go here --></ul>
+                </div>
+
+                <!-- Permanent task cards -->
+                <div class="task-card non-deletable" data-group="coordinators" data-type="todo">
+                    <div class="card-header">
+                        <h3>Admitted to Hospital</h3>
+                        <button class="add-task-item-btn">+</button>
+                    </div>
+                    <ul><!-- Tasks will be added here dynamically --></ul>
+                </div>
+
+                <div class="task-card non-deletable" data-group="coordinators" data-type="done">
+                    <div class="card-header">
+                        <h3>Returned from Hospital</h3>
+                    </div>
+                    <ul><!-- Completed tasks will go here --></ul>
+                </div>
+
+                <div class="task-card non-deletable" data-group="supervisors" data-type="todo">
+                    <div class="card-header">
+                        <h3>To Do - Supervisors</h3>
+                        <button class="add-task-item-btn">+</button>
+                    </div>
+                    <ul><!-- Tasks will be added here dynamically --></ul>
+                </div>
+
+                <div class="task-card non-deletable" data-group="supervisors" data-type="done">
+                    <div class="card-header">
+                        <h3>Tasks done - Supervisors</h3>
+                    </div>
+                    <ul><!-- Completed tasks will go here --></ul>
+                </div>
+
+                <!-- Sheets Needed Cards (Fixed) -->
+                <div class="task-card non-deletable" data-group="sheets-needed" data-type="todo" data-color="purple">
+                    <div class="card-header">
+                        <h3>To Do - Log Sheets Needed</h3>
+                        <button class="add-task-item-btn">+</button>
+                    </div>
+                    <ul><!-- Tasks will be added here dynamically --></ul>
+                </div>
+
+                <div class="task-card non-deletable" data-group="sheets-needed" data-type="done" data-color="purple">
+                    <div class="card-header">
+                        <h3>Log Sheets Delivered</h3>
+                    </div>
+                    <ul><!-- Completed tasks will go here --></ul>
+                </div>
+
+                <!-- Sick Carers (Orange) -->
+                <div class="task-card non-deletable" data-group="sick-carers" data-type="todo" data-color="orange">
+                    <div class="card-header">
+                        <h3>Sick Carers</h3>
+                        <button class="add-task-item-btn">+</button>
+                    </div>
+                    <ul></ul>
+                </div>
+
+                <div class="task-card non-deletable" data-group="sick-carers" data-type="done" data-color="orange">
+                    <div class="card-header">
+                        <h3>Sick Carers Returned</h3>
+                    </div>
+                    <ul></ul>
+                </div>
+
+                <!-- Carers to come in (Pink) -->
+                <div class="task-card non-deletable" data-group="carers-come-in" data-type="todo" data-color="pink">
+                    <div class="card-header">
+                        <h3>Carers to come in</h3>
+                        <button class="add-task-item-btn">+</button>
+                    </div>
+                    <ul></ul>
+                </div>
+
+                <div class="task-card non-deletable" data-group="carers-come-in" data-type="done" data-color="pink">
+                    <div class="card-header">
+                        <h3>Done - Carers to come in</h3>
+                    </div>
+                    <ul></ul>
+                </div>
+
+                <!-- Carers on Holiday (Indigo) -->
+                <div class="task-card non-deletable" data-group="holiday" data-type="todo" data-color="indigo">
+                    <div class="card-header">
+                        <h3>Carers on Holiday</h3>
+                        <button class="add-task-item-btn">+</button>
+                    </div>
+                    <ul></ul>
+                </div>
+
+                <div class="task-card non-deletable" data-group="holiday" data-type="done" data-color="indigo">
+                    <div class="card-header">
+                        <h3>Carers Returning from Holiday</h3>
+                    </div>
+                    <ul></ul>
+                </div>
+
+                <!-- Extra To Do (Teal) -->
+                <div class="task-card non-deletable" data-group="extra" data-type="todo" data-color="teal">
+                    <div class="card-header">
+                        <h3>Extra To Do</h3>
+                        <button class="add-task-item-btn">+</button>
+                    </div>
+                    <ul></ul>
+                </div>
+
+                <div class="task-card non-deletable" data-group="extra" data-type="done" data-color="teal">
+                    <div class="card-header">
+                        <h3>Extra Done</h3>
+                    </div>
+                    <ul></ul>
+                </div>
+
+                <!-- Dynamically added task cards will go here -->
+            </section>
+        </main>
+    </div>
+
+    <!-- Status Change Pop-up (hidden by default) -->
+    <div id="status-popup" class="status-popup hidden">
+        <ul class="status-popup-list">
+            <li data-status="free"><span class="status-dot status-free"></span> Free ⚡</li>
+            <li data-status="busy"><span class="status-dot status-busy"></span> Busy ⛔</li>
+            <li data-status="meeting"><span class="status-dot status-meeting"></span> In a meeting 📅</li>
+            <li data-status="on-call"><span class="status-dot status-on-call"></span> On Call 📞</li>
+            <li data-status="away"><span class="status-dot status-away"></span> Away 🚗💨</li>
+            <li data-status="break"><span class="status-dot status-break"></span> On Break 🍽️</li>
+            <li data-status="holiday"><span class="status-dot status-holiday"></span> On Holiday 🏖️</li>
+            <li data-status="offline"><span class="status-dot status-offline"></span> Offline 💤</li>
+        </ul>
+    </div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="custom-confirm-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <p id="confirm-modal-text">Are you sure you want to delete this sticker?</p>
+            <div class="modal-buttons">
+                <button id="confirm-delete-btn" class="btn-confirm">Delete</button>
+                <button id="cancel-delete-btn" class="btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task Editor/Viewer Modal -->
+    <div id="task-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="task-modal-title">New Task</h3>
+            <div class="priority-selection">
+                <label><input type="radio" name="priority" value="red" checked> <span
+                        class="priority-color-dot red"></span></label>
+                <label><input type="radio" name="priority" value="orange"> <span
+                        class="priority-color-dot orange"></span></label>
+                <label><input type="radio" name="priority" value="yellow"> <span
+                        class="priority-color-dot yellow"></span></label>
+            </div>
+
+            <div id="schedule-container" class="hidden schedule-container-margin">
+                <div id="start-date-container" class="hidden start-date-container-margin">
+                    <label for="task-start-input" class="form-label-bold">Start
+                        Date (Holiday):</label>
+                    <input type="date" id="task-start-input" class="form-input-full">
+                </div>
+
+                <label for="task-schedule-input" id="schedule-label" class="form-label-bold">Scheduled Return
+                    Date:</label>
+                <input type="datetime-local" id="task-schedule-input" class="form-input-full">
+            </div>
+
+            <input type="text" id="task-title-input" placeholder="Task Title (Client Name)" maxlength="100">
+            <textarea id="task-text-input" placeholder="Task description..." maxlength="400"></textarea>
+
+            <label id="solution-label" class="hidden solution-label-style">Resolution:</label>
+            <textarea id="task-solution-input" placeholder="Resolution / What was done..." rows="3"
+                class="hidden task-solution-input-style"></textarea>
+
+            <div id="task-dates" class="hidden">
+                <p><strong>Created on:</strong> <span id="creation-date"></span></p>
+                <p><strong>Completed on:</strong> <span id="completion-date"></span></p>
+            </div>
+            <div class="modal-buttons">
+                <button id="save-task-btn" class="btn-save">Save</button>
+                <button id="delete-task-btn" class="btn-delete hidden">Delete</button>
+                <button id="close-task-modal-btn" class="btn-cancel">Close</button>
+                <button id="complete-task-btn" class="btn-complete hidden">Mark as Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container for Toast Notifications -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

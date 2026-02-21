@@ -1,0 +1,449 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 280px;
+    background-color: #f1f3f5;
+    padding: 24px;
+    border-right: 1px solid #dee2e6;
+}
+
+.sidebar-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+}
+
+.employee-status-list {
+    margin-top: 32px;
+}
+
+.employee-status-list h4 {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.employee-status-list ul {
+    list-style: none;
+}
+
+.employee-status-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 1rem;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 12px;
+    cursor: pointer; /* To indicate it's clickable */
+}
+
+/* Status Colors */
+.status-free { background-color: #28a745; } /* Verde */
+.status-busy { background-color: #dc3545; } /* Vermelho */
+.status-meeting { background-color: #fd7e14; } /* Laranja */
+.status-on-call { background-color: #007bff; } /* Azul */
+.status-away { background-color: #6c757d; } /* Cinza */
+
+/* Add Sticker Button */
+.add-sticker-container {
+    margin-top: auto; /* Pushes it to the bottom */
+    padding-top: 24px;
+    text-align: center;
+}
+
+.add-sticker-btn {
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 1;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid #ced4da;
+    background-color: #f8f9fa;
+    color: #495057;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.add-sticker-btn:hover {
+    background-color: #e9ecef;
+    color: #000;
+}
+
+.add-sticker-container span {
+    display: block;
+    font-size: 14px;
+    color: #495057;
+}
+
+/* Filter Input */
+.filter-container {
+    margin-top: 24px;
+}
+
+#filter-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+/* Status Pop-up */
+.status-popup {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 8px;
+    z-index: 100;
+}
+
+.status-popup.hidden {
+    display: none;
+}
+
+.status-popup ul {
+    list-style: none;
+}
+
+.status-popup li {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.status-popup li:hover {
+    background-color: #f1f3f5;
+}
+
+.main-content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.main-header h1 {
+    font-size: 2rem;
+    margin-bottom: 24px;
+}
+
+.tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.task-card {
+    background-color: #ffffff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: relative; /* Needed for positioning the delete button */
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.card-header h3 {
+    margin: 0;
+}
+
+.add-task-item-btn {
+    border: none;
+    background: none;
+    font-size: 28px;
+    font-weight: bold;
+    color: #adb5bd;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.add-task-item-btn:hover { color: #28a745; } /* Green on hover */
+
+/* Custom Confirmation Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal-content p {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn-confirm, .btn-cancel, .btn-save, .btn-complete {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-confirm {
+    background-color: #dc3545; /* Red */
+    color: white;
+}
+
+.btn-confirm:hover {
+    background-color: #c82333;
+}
+
+.btn-cancel {
+    background-color: #6c757d; /* Gray */
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #5a6268;
+}
+
+.btn-save {
+    background-color: #007bff; /* Blue */
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #0069d9;
+}
+
+
+
+.hidden {
+    display: none !important;
+}
+
+.delete-sticker-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    border: none;
+    background: none;
+    font-size: 24px;
+    font-weight: bold;
+    color: #adb5bd;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.5;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.task-card:hover .delete-sticker-btn {
+    opacity: 1;
+}
+
+.delete-sticker-btn:hover {
+    color: #dc3545; /* Red on hover */
+}
+
+.task-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+}
+
+.task-card ul {
+    list-style-position: inside;
+    padding-left: 4px;
+    color: #495057;
+    max-height: 350px; /* Approx 10 items */
+    overflow-y: auto;
+}
+
+/* Priority Colors */
+.task-card.priority-1 { border-top: 5px solid #ffc107; } /* Amarelo */
+.task-card.priority-2 { border-top: 5px solid #fd7e14; } /* Laranja */
+.task-card.priority-3 { border-top: 5px solid #dc3545; } /* Vermelho */
+.task-card.priority-done { border-top: 5px solid #28a745; } /* Verde */
+.task-card.priority-4 { border-top: 5px solid #007bff; } /* Azul */
+.task-card.priority-5 { border-top: 5px solid #6f42c1; } /* Roxo */
+
+/* Hide delete button on non-deletable cards */
+.non-deletable .delete-sticker-btn {
+    display: none;
+}
+
+/* Task Modal Styles */
+#task-modal .modal-content {
+    width: 90%;
+    max-width: 600px; /* Larger modal for text input */
+}
+
+#task-modal input[type="text"],
+#task-modal textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1rem;
+        font-family: inherit;
+    }
+
+    #task-dates {
+        margin-top: 15px;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    #task-dates p {
+        margin: 5px 0;
+    }
+
+#task-modal textarea {
+    min-height: 150px;
+    resize: vertical;
+}
+
+.btn-complete {
+    background-color: #28a745; /* Green */
+    color: white;
+}
+
+.btn-complete:hover {
+    background-color: #218838;
+}
+
+/* Priority Selection in Modal */
+.priority-selection {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.priority-selection label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.priority-selection input[type="radio"] {
+    display: none; /* Hide the actual radio button */
+}
+
+.priority-color-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.priority-selection input[type="radio"]:checked + .priority-color-dot {
+    border-color: #007bff; /* Highlight selected */
+}
+
+/* Priority Dot Colors */
+.priority-color-dot.red { background-color: #dc3545; }
+.priority-color-dot.orange { background-color: #fd7e14; }
+.priority-color-dot.yellow { background-color: #ffc107; }
+
+/* Task Item Priority Indicator */
+.task-item-priority-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 10px;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.task-item-priority-dot.red { background-color: #dc3545; }
+.task-item-priority-dot.orange { background-color: #fd7e14; }
+.task-item-priority-dot.yellow { background-color: #ffc107; }
+
+.task-card ul li {
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+/* Visual Grouping Styles */
+.task-card[data-group="coordinators"] {
+    border-top: 5px solid #007bff; /* Blue */
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.task-card[data-group="supervisors"] {
+    border-top: 5px solid #28a745; /* Green */
+    background-color: rgba(40, 167, 69, 0.05);
+}
+
+/* Dynamic Group Colors */
+.task-card[data-color="purple"] {
+    border-top: 5px solid #6f42c1; /* Roxo */
+    background-color: rgba(111, 66, 193, 0.05);
+}
+
+.task-card[data-color="orange"] {
+    border-top: 5px solid #fd7e14; /* Laranja */
+    background-color: rgba(253, 126, 20, 0.05);
+}
+
+.task-card[data-color="cyan"] {
+    border-top: 5px solid #17a2b8; /* Ciano */
+    background-color: rgba(23, 162, 184, 0.05);
+}
+
+.task-card[data-color="pink"] {
+    border-top: 5px solid #e83e8c; /* Rosa */
+    background-color: rgba(232, 62, 140, 0.05);
+}

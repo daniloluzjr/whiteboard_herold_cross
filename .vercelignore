@@ -1,0 +1,8 @@
+server.js
+package.json
+package-lock.json
+schema.sql
+.env
+.env.example
+node_modules
+# vercel.json must NOT be ignored!

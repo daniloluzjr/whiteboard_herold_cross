@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Harold Cross</title>
+    <link rel="icon" type="image/png" href="assets/favicon-32x32.png">
+    <link rel="stylesheet" href="app.css?v=5">
+
+</head>
+
+<body class="login-page">
+
+    <div class="form-container" id="login-container">
+        <h1>Login</h1>
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+
+            <div class="remember-me-container">
+                <input type="checkbox" id="remember-me" class="remember-me-checkbox">
+                <label for="remember-me" class="remember-me-label">Remember me</label>
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+        <a id="show-register" class="toggle-link">Don't have an account? Register</a>
+
+        <div class="support-link-container">
+            <p>Problems with login or bugs?<br>
+                <a href="mailto:danilo@iniscare.ie">Contact Support</a>
+            </p>
+        </div>
+    </div>
+
+    <div class="form-container hidden" id="register-container">
+        <h1>Register for Whiteboard</h1>
+        <form id="register-form">
+            <input type="text" id="register-name" placeholder="Name" required>
+            <input type="email" id="register-email" placeholder="Email" required>
+            <input type="password" id="register-password" placeholder="Password" required>
+            <input type="password" id="register-confirm-password" placeholder="Confirm Password" required>
+            <button type="submit">Register</button>
+        </form>
+        <a id="show-login" class="toggle-link">Already have an account? Login</a>
+
+        <div class="support-link-container">
+            <p>Problems with login or bugs?<br>
+                <a href="mailto:danilo@iniscare.ie">Contact Support</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="notification-container"></div>
+
+    <script src="app.js"></script>
+    <!-- Force Update -->
+</body>
+
+</html>

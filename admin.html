@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whiteboard Admin</title>
+  <link rel="stylesheet" href="app.css">
+</head>
+
+<body class="admin-body">
+  <h1>🛠️ Admin Dashboard</h1>
+  <button onclick="loadData()" class="refresh-btn">Refresh Data</button>
+
+  <div class="admin-section">
+    <h2>Users</h2>
+    <table id="users-table" class="admin-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Last Login</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Users here -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="admin-section">
+    <h2>Activity Log (Log Reg)</h2>
+    <table id="tasks-table" class="admin-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Time</th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Task</th>
+          <th>Group</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Logs here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const API_URL = 'https://web-production-b230e.up.railway.app/api';
+
+    // Explicitly attach to window
+    window.editUser = async function (id) {
+      // ... (existing editUser code)
+      const user = window.allUsers ? window.allUsers.find(u => u.id == id) : null;
+      const currentName = user ? user.name : '';
+
+      const newName = prompt("Enter new name for user:", currentName);
+      if (newName && newName !== currentName) {
+        try {
+          const res = await fetch(`${API_URL}/users/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: newName })
+          });
+          if (res.ok) {
+            alert('User updated.');
+            loadData();
+          } else {
+            alert('Failed to update user.');
+          }
+        } catch (e) {
+          alert('Error updating user: ' + e.message);
+          console.error(e);
+        }
+      }
+    };
+
+    window.deleteUser = async function (id) {
+      console.log('Attempting to delete user:', id);
+      if (confirm('Are you certain you want to delete this user? This cannot be undone.')) {
+        try {
+          const res = await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' });
+          if (res.ok) {
+            alert('User deleted.');
+            loadData();
+          } else {
+            // Fallback: if protected and we have no token, this might fail.
+            // But since we added the public PATCH route, at least edit will work.
+            alert('Failed to delete user.');
+          }
+        } catch (e) {
+          alert('Error deleting user: ' + e.message);
+          console.error(e);
+        }
+      }
+    };
+
+    // Note: deleteTask is no longer needed in the UI for logs, but keeping function if needed theoretically 
+    // or we can remove the button from the Log table (Logs shouldn't be deleted easily).
+
+    async function loadData() {
+      let userMap = {};
+
+      // 1. Load Users & Build Map
+      try {
+        const resUsers = await fetch(`${API_URL}/users`);
+        const users = await resUsers.json();
+        window.allUsers = users;
+
+        users.forEach(u => {
+          userMap[u.id] = u.name;
+        });
+
+        const userRows = users.map(u => {
+          let lastLoginStr = '-';
+          if (u.last_login) {
+            const d = new Date(u.last_login);
+            lastLoginStr = d.toLocaleDateString('en-GB') + ' ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+          }
+          return `
+            <tr>
+                <td>${u.id}</td>
+                <td>${u.name || '-'}</td>
+                <td>${u.email}</td>
+                <td>${lastLoginStr}</td>
+                <td>${u.status || 'free'}</td>
+                <td>
+                    <button onclick="editUser('${u.id}')" class="btn-edit-user">Edit</button>
+                    <button onclick="deleteUser('${u.id}')" class="btn-small-delete">Delete</button>
+                </td>
+            </tr>
+            `;
+        }).join('');
+        document.querySelector('#users-table tbody').innerHTML = userRows;
+      } catch (e) { console.error("Error loading users:", e); }
+
+      // 2. Load Activity Log
+      try {
+        const resLogs = await fetch(`${API_URL}/logs`); // NEW Endpoint
+        const logs = await resLogs.json();
+
+        const logRows = logs.map(log => {
+          const dateObj = new Date(log.created_at);
+          // Use en-GB for DD/MM/YYYY format
+          const dateStr = dateObj.toLocaleDateString('en-GB');
+          const timeStr = dateObj.toLocaleTimeString('en-GB');
+
+          let actionClass = '';
+          if (log.action === 'CREATED') actionClass = 'action-created';
+          if (log.action === 'COMPLETED') actionClass = 'action-completed';
+
+          return `
+                <tr>
+                    <td>${dateStr}</td>
+                    <td>${timeStr}</td>
+                    <td>${log.user_name || 'Unknown'}</td>
+                    <td class="${actionClass}">${log.action}</td>
+                    <td>${log.task_title || '-'}</td>
+                    <td>${log.group_name || '-'}</td>
+                </tr>
+            `;
+        }).join('');
+        document.querySelector('#tasks-table tbody').innerHTML = logRows;
+      } catch (e) { console.error("Error loading logs:", e); }
+    }
+
+    // Auto load
+    loadData();
+  </script>
+</body>
+
+</html>

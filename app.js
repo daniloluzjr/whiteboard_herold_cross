@@ -791,6 +791,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         renderFixedGroupTasks(group);
                     } else if (lowerName === 'coordinators') {
                         renderFixedGroupTasks(group);
+                    } else if (lowerName === 'supervisors') {
+                        renderFixedGroupTasks(group);
+                    } else if (lowerName === 'log sheets needed' || lowerName === 'sheets needed' || lowerName === 'log sheets delivered') {
+                        renderFixedGroupTasks(group);
                     } else if (lowerName === 'extra to do' || lowerName === 'extra done') {
                         renderFixedGroupTasks(group);
 

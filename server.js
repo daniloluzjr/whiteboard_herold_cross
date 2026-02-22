@@ -305,7 +305,7 @@ async function runMigrations() {
             }
 
             // 3. Delete duplicated groups (Introduction, Sick Carers, etc.)
-            const groupsToClean = ['Introduction', 'Introduction (Schedule)', 'Sick Carers', 'Carers on Holiday', 'Extra To Do', 'Log Sheets Needed'];
+            const groupsToClean = ['Introduction', 'Introduction (Schedule)', 'Supervisors', 'Sick Carers', 'Carers on Holiday', 'Extra To Do', 'Log Sheets Needed'];
             for (const gName of groupsToClean) {
                 const [allG] = await pool.query("SELECT id FROM task_groups WHERE name = ? ORDER BY id ASC", [gName]);
                 if (allG.length > 1) {

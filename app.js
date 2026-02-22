@@ -274,9 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let activeGroupType = 'standard'; // 'standard', 'intro', 'compact'
         let currentTaskData = null;
 
-        // --- Initialization ---
-        initializeBoard();
-
         // --- Fix for Navigation/Cache Restoration ---
         // Ensures data reloads when user navigates back to the page (handling bfcache)
         window.addEventListener('pageshow', (event) => {
@@ -301,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadGroups();
             loadUsers();
             checkHolidayReturns(); // NEW: Check for holiday returns
-        }, 600000); // 10 Minutes (600000ms)
+        }, 5000); // 5 Seconds
 
         // NEW: Check for Holiday Returns (Run more frequently? Or just with auto-refresh)
         // Since auto-refresh is 10 mins, maybe we run this check every 60 seconds independently?
@@ -1794,12 +1791,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
         // --- INITIALIZATION ---
-        // --- INITIALIZATION ---
         (async () => {
             try {
                 await setupFixedGroups();
-                await loadGroups();
-                await loadUsers(); // Ensure users load too
+                await loadUsers(); // Load users FIRST to populate cache
+                await loadGroups(); // Then load groups
             } catch (e) {
                 console.error(e);
                 alert("Init Failed: " + e.message);

@@ -195,7 +195,7 @@ async function runMigrations() {
     try {
         // --- Core Table Creation ---
         console.log("Migration: Checking core tables...");
-        
+
         await pool.query(`
             CREATE TABLE IF NOT EXISTS task_groups (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -232,7 +232,7 @@ async function runMigrations() {
         `);
         console.log("Migration: Core tables verified.");
 
-        // --- Column-level Migrations ---
+        // Check if 'solution' column exists
         const [columns] = await pool.query("SHOW COLUMNS FROM tasks LIKE 'solution'");
         if (columns.length === 0) {
             console.log("Migration: Adding 'solution' column to tasks table...");
@@ -257,7 +257,6 @@ async function runMigrations() {
         }
 
         // Check if 'completed_by' column exists (Task Completion User)
-        // Note: created_by already exists and was added earlier, but let's ensure completed_by is there too if distinct
         const [columnsCompletedBy] = await pool.query("SHOW COLUMNS FROM tasks LIKE 'completed_by'");
         if (columnsCompletedBy.length === 0) {
             console.log("Migration: Adding 'completed_by' column to tasks table...");
@@ -289,6 +288,39 @@ async function runMigrations() {
             console.log("Migration: Adding 'last_login' column to users table...");
             await pool.query("ALTER TABLE users ADD COLUMN last_login DATETIME NULL");
             console.log("Migration: 'last_login' column added.");
+        }
+
+        // --- One-time Cleanup for Whiteboard Parity ---
+        try {
+            // 1. Rename ID 4 back to original name (Admitted to Hospital)
+            await pool.query("UPDATE task_groups SET name = 'Admitted to Hospital' WHERE id = 4");
+
+            // 2. Ensure "Coordinators" group exists as a NEW group
+            const [coordCheck] = await pool.query("SELECT id FROM task_groups WHERE name = 'Coordinators'");
+            if (coordCheck.length === 0) {
+                console.log("Migration: Creating new 'Coordinators' group...");
+                await pool.query("INSERT INTO task_groups (name, color) VALUES ('Coordinators', 'pink')");
+            } else {
+                await pool.query("UPDATE task_groups SET color = 'pink' WHERE name = 'Coordinators'");
+            }
+
+            // 3. Delete duplicated groups (Introduction, Sick Carers, etc.)
+            const groupsToClean = ['Introduction', 'Introduction (Schedule)', 'Sick Carers', 'Carers on Holiday', 'Extra To Do', 'Log Sheets Needed'];
+            for (const gName of groupsToClean) {
+                const [allG] = await pool.query("SELECT id FROM task_groups WHERE name = ? ORDER BY id ASC", [gName]);
+                if (allG.length > 1) {
+                    const keepId = allG[0].id;
+                    const idsToDelete = allG.slice(1).map(g => g.id);
+                    console.log(`Migration: Cleaning duplicates for ${gName}. Keeping ${keepId}, deleting ${idsToDelete}`);
+
+                    // Move tasks to the kept group before deleting
+                    await pool.query("UPDATE tasks SET group_id = ? WHERE group_id IN (?)", [keepId, idsToDelete]);
+                    await pool.query("DELETE FROM task_groups WHERE id IN (?)", [idsToDelete]);
+                }
+            }
+
+        } catch (cleanupErr) {
+            console.warn("Migration: Cleanup check failed:", cleanupErr.message);
         }
 
     } catch (err) {

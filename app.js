@@ -418,12 +418,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setInterval(checkAutoLogout, 60000); // Check every minute
         checkAutoLogout(); // Check immediately on load too, just in case they open it right at 8:30
-        async function initializeBoard() {
-            await setupFixedGroups();
-            loadGroups();
-            loadUsers(); // NEW: Load users
-        }
-
         async function setupFixedGroups() {
             // Ensure fixed groups exist in DB and update DOM with their real IDs
             const groups = await fetchGroups();
@@ -459,9 +453,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // If we have both, move tasks from secondary to main, then delete secondary
             else if (secondaryGroup && mainSickGroup) {
                 console.log("Merging Sick groups...");
-                // Note: We need to move tasks. Since we don't have a bulk move API easily here, 
-                // we will rely on the user manually moving them IF we can't do it.
-                // But wait, we can just loop update.
                 if (secondaryGroup.tasks && secondaryGroup.tasks.length > 0) {
                     for (const task of secondaryGroup.tasks) {
                         await updateTaskAPI(task.id, { group_id: mainSickGroup.id });
@@ -481,50 +472,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Extra To Do', selector: '[data-group="extra"]', color: 'teal' }
             ];
 
-            // CLEANUP: Automated merging for duplicate groups from previous versions (TODOWEB1 style)
-            const cleanUpDefs = [
-                { old: 'To Do - Coordinators', main: 'Coordinators' },
-                { old: 'Tasks done - Coordinators', main: 'Coordinators' },
-                { old: 'To Do - Supervisors', main: 'Supervisors' },
-                { old: 'Tasks done - Supervisors', main: 'Supervisors' },
-                { old: 'To Do - Log Sheets Needed', main: 'Log Sheets Needed' },
-                { old: 'Tasks done - Log Sheets Needed', main: 'Log Sheets Needed' },
-                { old: 'Carers to come in', action: 'delete' },
-                { old: 'Done - Carers to come in', action: 'delete' }
-            ];
-
-            for (const clean of cleanUpDefs) {
-                const oldG = groups.find(g => g.name === clean.old);
-                if (oldG) {
-                    if (clean.action === 'delete') {
-                        console.log(`Deleting unwanted group: ${clean.old}`);
-                        await deleteGroupAPI(oldG.id);
-                    } else {
-                        const mainG = groups.find(g => g.name === clean.main);
-                        if (mainG && mainG.id !== oldG.id) {
-                            console.log(`Merging ${clean.old} into ${clean.main}`);
-                            // Fetch full group with tasks if not present? groups from fetchGroups should have tasks? 
-                            // Actually loadGroups fetches them with tasks often.
-                            // But here we might not have tasks array. Let's assume they might.
-                            // If they are separate in DB, we'll need to move tasks.
-                            // I'll add a helper to move tasks if I can.
-                            await deleteGroupAPI(oldG.id); // For now just delete to clean UI as requested.
-                            // Normally we would merge tasks, but user said "delete" and it's a new instance.
-                        } else if (!mainG) {
-                            // If main doesn't exist, just rename this one?
-                            await renameGroupAPI(oldG.id, clean.main);
-                        }
-                    }
-                }
-            }
-
             for (const def of fixedDefs) {
                 // Approximate match for Intro to avoid creating duplicates if one exists
                 let dbGroup = groups.find(g => g.name === def.name);
                 if (def.name.startsWith('Introduction')) {
                     dbGroup = groups.find(g => g.name === 'Introduction' || g.name === 'Introduction (Schedule)');
                 } else if (def.name === 'Sick Carers') {
-                    // Refresh search in case we just created/renamed it above
                     dbGroup = groups.find(g => g.name === 'Sick Carers');
                 }
 
@@ -544,7 +497,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             card.classList.remove('hidden');
                         });
                     } else {
-                        // Fallback: This is expected if HTML is missing. We will warn.
                         console.warn(`Hardcoded card for ${def.name} not found.`);
                     }
                 }
@@ -745,6 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Identify Fixed Group IDs
             const coordGroup = groups.find(g => g.name === 'Coordinators');
+            const hospitalGroup = groups.find(g => g.name === 'Admitted to Hospital') || groups.find(g => g.name === 'Hospital');
             const superGroup = groups.find(g => g.name === 'Supervisors');
             const introGroup = groups.find(g => g.name === 'Introduction' || g.name === 'Introduction (Schedule)');
             const sheetsGroup = groups.find(g => g.name === 'Log Sheets Needed') || groups.find(g => g.name === 'Sheets Needed');
@@ -757,20 +710,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const holidayGroup = groups.find(g => g.name === 'Carers on Holiday');
             const extraGroup = groups.find(g => g.name === 'Extra To Do');
 
+            // [NEW] CRITICAL: Associate Numeric IDs to Hardcoded Cards BEFORE rendering
+            if (hospitalGroup) document.querySelectorAll('[data-group="hospital"]').forEach(c => c.dataset.group = hospitalGroup.id);
+            if (coordGroup) document.querySelectorAll('[data-group="coordinators"]').forEach(c => c.dataset.group = coordGroup.id);
+            if (superGroup) document.querySelectorAll('[data-group="supervisors"]').forEach(c => c.dataset.group = superGroup.id);
+            if (introGroup) document.querySelectorAll('[data-group="introduction"]').forEach(c => c.dataset.group = introGroup.id);
+            if (sheetsGroup) document.querySelectorAll('[data-group="sheets-needed"]').forEach(c => c.dataset.group = sheetsGroup.id);
+            if (sickGroup) document.querySelectorAll('[data-group="sick-carers"]').forEach(c => c.dataset.group = sickGroup.id);
+            if (holidayGroup) document.querySelectorAll('[data-group="holiday"]').forEach(c => c.dataset.group = holidayGroup.id);
+            if (extraGroup) document.querySelectorAll('[data-group="extra"]').forEach(c => c.dataset.group = extraGroup.id);
+
             const fixedIds = [
                 coordGroup?.id,
+                hospitalGroup?.id,
                 superGroup?.id,
                 introGroup?.id,
                 sheetsGroup?.id,
                 sickGroup?.id,
                 sickReturnedGroup?.id,
-                carersComeInGroup?.id,
                 holidayGroup?.id,
                 extraGroup?.id
             ].filter(id => id);
 
             // [FIX] Force Colors for Fixed Groups in Memory if missing (or override as requested)
-            if (coordGroup) coordGroup.color = 'pink'; // User requested PINK for Coordinators
+            if (coordGroup && !coordGroup.color) coordGroup.color = 'pink';
+            if (hospitalGroup && !hospitalGroup.color) hospitalGroup.color = 'pink'; // Hospital now pink as requested
             if (superGroup && !superGroup.color) superGroup.color = 'green';
             if (introGroup && !introGroup.color) introGroup.color = 'cyan';
             if (sheetsGroup && !sheetsGroup.color) sheetsGroup.color = 'purple';
@@ -804,8 +768,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (lowerName.includes('introduction')) {
                         console.log("Found floating Introduction group, forcing render as fixed.");
                         renderIntroductionTasks(group);
-                        const hardcodedCard = document.querySelector('[data-group="introduction"]');
-                        if (hardcodedCard) hardcodedCard.dataset.group = group.id;
+                        const hardcodedCards = document.querySelectorAll('[data-group="introduction"]');
+                        hardcodedCards.forEach(card => card.dataset.group = group.id);
 
                     } else if (
                         lowerName === 'sick carers' ||
@@ -820,23 +784,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         const hardcodedCards = document.querySelectorAll(selector);
                         hardcodedCards.forEach(card => card.dataset.group = group.id);
 
-                    } else if (lowerName === 'carers to come in' || lowerName === 'done - carers to come in') {
-                        console.log(`Found floating fixed group ${group.name}, forcing render as fixed.`);
-                        renderFixedGroupTasks(group);
-                        const hardcodedCards = document.querySelectorAll('[data-group="carers-come-in"]');
-                        hardcodedCards.forEach(card => card.dataset.group = group.id);
-
                     } else if (lowerName === 'carers on holiday' || lowerName === 'carers returning from holiday') {
                         console.log(`Found floating fixed group ${group.name}, forcing render as fixed.`);
                         renderFixedGroupTasks(group);
                         const hardcodedCards = document.querySelectorAll('[data-group="holiday"]');
                         hardcodedCards.forEach(card => card.dataset.group = group.id);
 
-                    } else if (lowerName === 'extra to do' || lowerName === 'extra done') {
-                        console.log(`Found floating fixed group ${group.name}, forcing render as fixed.`);
+                    } else if (lowerName === 'admitted to hospital' || lowerName === 'returned from hospital' || lowerName === 'hospital') {
                         renderFixedGroupTasks(group);
-                        const hardcodedCards = document.querySelectorAll('[data-group="extra"]');
-                        hardcodedCards.forEach(card => card.dataset.group = group.id);
+                    } else if (lowerName === 'coordinators') {
+                        renderFixedGroupTasks(group);
+                    } else if (lowerName === 'extra to do' || lowerName === 'extra done') {
+                        renderFixedGroupTasks(group);
 
                     } else if (
                         group.name === 'Carer Sick' ||
@@ -924,58 +883,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function renderFixedGroupTasks(group) {
-            // Find the DOM elements for this group (now using ID match)
-            const todoCard = document.querySelector(`.task-card[data-group="${group.id}"][data-type="todo"]`);
-            const doneCard = document.querySelector(`.task-card[data-group="${group.id}"][data-type="done"]`);
+            // Find ALL DOM elements for this group
+            const todoCards = document.querySelectorAll(`.task-card[data-group="${group.id}"][data-type="todo"]`);
+            const doneCards = document.querySelectorAll(`.task-card[data-group="${group.id}"][data-type="done"]`);
 
-            if (todoCard && doneCard) {
-                const todoContainer = todoCard.querySelector('ul');
-                const doneContainer = doneCard.querySelector('ul');
-
-                // Determine color based on name if group.color is missing (Legacy Fix)
-                let groupColor = group.color;
-                if (!groupColor) {
-                    if (group.name === 'Coordinators') groupColor = 'yellow';
-                    else if (group.name === 'Supervisors') groupColor = 'green';
-                    else if (group.name === 'Log Sheets Needed' || group.name === 'Sheets Needed') groupColor = 'purple';
-                    else if (group.name.includes('Introduction')) groupColor = 'cyan';
-                    else if (group.name === 'Sick Carers') groupColor = 'orange'; // Ensure Sick Carers gets orange
-                    else if (group.name === 'Carers to come in') groupColor = 'pink';
-                }
-
-                // Check if this group should be schedule-based
-                const isScheduleGroup = group.name.includes('Introduction') ||
-                    group.name === 'Sick Carers' ||
-                    group.name === 'Coordinators' ||
-                    group.name === 'Carers to come in' ||
-                    group.name === 'Carers on Holiday';
-
-                if (isScheduleGroup) {
-                    // Schedule Mode: Sort by Scheduled Date ASC, Use Vertical Layout
-                    const todoTasks = group.tasks.filter(t => t.status !== 'done');
-
-                    // Determine render mode
-                    let renderMode = 'standard';
-                    if (group.name.includes('Introduction')) renderMode = 'intro';
-                    else if (group.name === 'Coordinators' || group.name.includes('Admitted to Hospital')) renderMode = 'compact';
-                    else if (group.name === 'Carers on Holiday' || group.name === 'Sick Carers') renderMode = 'holiday';
-                    // 'Carers to come in' remains standard for now unless requested otherwise, or maybe compact too? 
-                    // User only specified Hospital and Sick Carers for now.
-
-                    renderGroupedList(todoContainer, todoTasks, 'scheduled_at', 'asc', renderMode, groupColor);
-
-                    const doneTasks = group.tasks.filter(t => t.status === 'done');
-                    // [CHANGED] Standardize DONE lists to be Newest First (Desc) for all schedule groups
-                    renderGroupedList(doneContainer, doneTasks, 'scheduled_at', 'desc', renderMode, groupColor);
-                } else {
-                    // Standard Mode: Sort by Created/Completed Date DESC
-                    const todoTasks = group.tasks.filter(t => t.status !== 'done');
-                    renderGroupedList(todoContainer, todoTasks, 'created_at', 'desc', 'standard', groupColor);
-
-                    const doneTasks = group.tasks.filter(t => t.status === 'done');
-                    renderGroupedList(doneContainer, doneTasks, 'completed_at', 'desc', 'standard', groupColor);
-                }
+            // Determine color based on name if group.color is missing (Legacy Fix)
+            let groupColor = group.color;
+            if (!groupColor) {
+                if (group.name === 'Coordinators') groupColor = 'pink';
+                else if (group.name === 'Supervisors') groupColor = 'green';
+                else if (group.name === 'Log Sheets Needed' || group.name === 'Sheets Needed') groupColor = 'purple';
+                else if (group.name.includes('Introduction')) groupColor = 'cyan';
+                else if (group.name === 'Sick Carers') groupColor = 'orange';
+                else if (group.name === 'Carers on Holiday') groupColor = 'indigo';
             }
+
+            // Check if this group should be schedule-based
+            const isScheduleGroup = group.name.includes('Introduction') ||
+                group.name === 'Sick Carers' ||
+                group.name === 'Coordinators' ||
+                group.name === 'Admitted to Hospital' ||
+                group.name === 'Carers on Holiday';
+
+            const todoTasks = group.tasks.filter(t => t.status !== 'done');
+            const doneTasks = group.tasks.filter(t => t.status === 'done');
+
+            // Render into ALL matching cards
+            todoCards.forEach(card => {
+                const container = card.querySelector('ul');
+                let renderMode = 'standard';
+                if (group.name.includes('Introduction')) renderMode = 'intro';
+                else if (group.name === 'Coordinators' || card.querySelector('h3').innerText.includes('Hospital')) renderMode = 'compact';
+                else if (group.name === 'Carers on Holiday' || group.name === 'Sick Carers') renderMode = 'holiday';
+
+                const color = card.dataset.color || groupColor; // Use card's own color attribute if set
+                renderGroupedList(container, todoTasks, isScheduleGroup ? 'scheduled_at' : 'created_at', isScheduleGroup ? 'asc' : 'desc', renderMode, color);
+            });
+
+            doneCards.forEach(card => {
+                const container = card.querySelector('ul');
+                let renderMode = 'standard';
+                if (group.name.includes('Introduction')) renderMode = 'intro';
+                else if (group.name === 'Coordinators' || card.querySelector('h3').innerText.includes('Hospital')) renderMode = 'compact';
+                else if (group.name === 'Carers on Holiday' || group.name === 'Sick Carers') renderMode = 'holiday';
+
+                const color = card.dataset.color || groupColor;
+                renderGroupedList(container, doneTasks, isScheduleGroup ? 'scheduled_at' : 'completed_at', 'desc', renderMode, color);
+            });
         }
 
         // --- Logout Logic ---

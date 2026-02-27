@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whiteboard</title>
+    <title>Whiteboard - Harold Cross</title>
     <link rel="icon" type="image/png" href="assets/favicon-32x32.png">
-    <link rel="stylesheet" href="app.css?v=20">
+    <link rel="stylesheet" href="app.css?v=30">
 </head>
 
 <body>
@@ -60,14 +60,14 @@
         <main class="main-content">
             <header class="main-header main-header-flex">
                 <button id="mobile-menu-toggle" class="mobile-menu-btn hidden-desktop">☰</button>
-                <h1>Whiteboard - Glasnevin</h1>
+                <h1>Whiteboard - Harold Cross</h1>
             </header>
             <section class="tasks-grid">
                 <!-- Introduction Card (New Feature) -->
                 <div class="task-card non-deletable" data-group="introduction" data-type="todo">
                     <div class="card-header">
                         <h3>Introduction (Schedule)</h3>
-                        <button class="add-task-item-btn">+</button>
+                        <button id="harold-intro-add-btn" class="add-task-item-btn">+</button>
                     </div>
                     <ul id="introduction-list"><!-- Tasks grouped by date will go here --></ul>
                 </div>
@@ -80,8 +80,7 @@
                 </div>
 
                 <!-- Permanent task cards -->
-                <!-- Permanent task cards -->
-                <div class="task-card non-deletable" data-group="hospital" data-type="todo" data-color="pink">
+                <div class="task-card non-deletable" data-group="coordinators" data-type="todo">
                     <div class="card-header">
                         <h3>Admitted to Hospital</h3>
                         <button class="add-task-item-btn">+</button>
@@ -89,12 +88,13 @@
                     <ul><!-- Tasks will be added here dynamically --></ul>
                 </div>
 
-                <div class="task-card non-deletable" data-group="hospital" data-type="done" data-color="pink">
+                <div class="task-card non-deletable" data-group="coordinators" data-type="done">
                     <div class="card-header">
                         <h3>Returned from Hospital</h3>
                     </div>
                     <ul><!-- Completed tasks will go here --></ul>
                 </div>
+
                 <div class="task-card non-deletable" data-group="supervisors" data-type="todo">
                     <div class="card-header">
                         <h3>To Do - Supervisors</h3>
@@ -142,20 +142,18 @@
                     <ul></ul>
                 </div>
 
-
-
-                <!-- Coordinators (Pink) -->
-                <div class="task-card non-deletable" data-group="coordinators" data-type="todo" data-color="pink">
+                <!-- Carers to come in (Pink) -->
+                <div class="task-card non-deletable" data-group="carers-come-in" data-type="todo" data-color="pink">
                     <div class="card-header">
-                        <h3>To Do - Coordinators</h3>
+                        <h3>Carers to come in</h3>
                         <button class="add-task-item-btn">+</button>
                     </div>
                     <ul></ul>
                 </div>
 
-                <div class="task-card non-deletable" data-group="coordinators" data-type="done" data-color="pink">
+                <div class="task-card non-deletable" data-group="carers-come-in" data-type="done" data-color="pink">
                     <div class="card-header">
-                        <h3>Tasks done - Coordinators</h3>
+                        <h3>Done - Carers to come in</h3>
                     </div>
                     <ul></ul>
                 </div>
@@ -238,11 +236,11 @@
             <div id="schedule-container" class="hidden schedule-container-margin">
                 <div id="start-date-container" class="hidden start-date-container-margin">
                     <label for="task-start-input" class="form-label-bold">Start
-                        Date:</label>
+                        Date (Holiday):</label>
                     <input type="date" id="task-start-input" class="form-input-full">
                 </div>
 
-                <label for="task-schedule-input" id="schedule-label" class="form-label-bold">Return
+                <label for="task-schedule-input" id="schedule-label" class="form-label-bold">Scheduled Return
                     Date:</label>
                 <input type="datetime-local" id="task-schedule-input" class="form-input-full">
             </div>
@@ -270,7 +268,7 @@
     <!-- Container for Toast Notifications -->
     <div id="notification-container" class="notification-container"></div>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=30"></script>
 </body>
 
 </html>

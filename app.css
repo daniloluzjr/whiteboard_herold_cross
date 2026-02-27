@@ -9,10 +9,10 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: #ffffff;
   color: #212529;
-  background-image: url('assets/bg-glasnevin.png');
+  background-image: url('assets/bg-harold_cross.png');
   background-position: center bottom;
   background-repeat: no-repeat;
-  background-size: 100% auto;
+  background-size: cover;
   background-attachment: fixed;
 }
 
@@ -278,7 +278,7 @@ body {
 
 /* Global hover removed to allow card-specific colors */
 .add-task-item-btn:hover {
-  /* Default opacity change instead of fixed color */
+  /* Default gray in case no group matches, but cards will override */
   opacity: 0.8;
 }
 
@@ -1085,9 +1085,8 @@ body {
   gap: 15px;
 }
 
-.text-cyan {
-  color: #17a2b8 !important;
-  /* Force override for button */
+#harold-intro-add-btn {
+  color: #adb5bd;
 }
 
 .status-popup-list {
@@ -1186,17 +1185,11 @@ body {
   color: #555;
 }
 
-.notification-close-btn {
-  background: none;
-  border: none;
-  color: inherit;
-  cursor: pointer;
-  font-size: 1.2rem;
-}
-
 /* Card-specific hover colors */
-.task-card[data-group="introduction"] .add-task-item-btn:hover {
+.task-card[data-group="introduction"] .add-task-item-btn:hover,
+#harold-intro-add-btn:hover {
   color: #17a2b8 !important;
+  opacity: 1 !important;
 }
 
 .task-card[data-group="coordinators"] .add-task-item-btn:hover {
@@ -1240,8 +1233,10 @@ body {
   color: #20c997 !important;
 }
 
-/* Force specific hover color for introduction to avoid any ambiguity */
-.task-card[data-group="introduction"] .add-task-item-btn:hover {
-  color: #17a2b8 !important;
-  opacity: 1 !important;
+.notification-close-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1.2rem;
 }

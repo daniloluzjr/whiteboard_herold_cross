@@ -1085,9 +1085,8 @@ body {
   gap: 15px;
 }
 
-.text-cyan {
-  color: #17a2b8 !important;
-  /* Force override for button */
+#harold-intro-add-btn {
+  color: #adb5bd !important;
 }
 
 .status-popup-list {
